@@ -1,39 +1,65 @@
+using System.Xml.Serialization;
 using UnityEngine;
 
 public class BasicMovement : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public int movSpeed = 15;
+    public float fuerzaSalto = 5f;
+    private bool canJump;
+
+    private Rigidbody rb;
+
     void Start()
     {
-        
+        rb = GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        CheckMovement();
+        move();
+        jump();
     }
 
-    public void CheckMovement()
+    private void move()
     {
-        if (Input.GetKey(KeyCode.UpArrow))
+        if (Input.GetKey(KeyCode.A))
         {
-            gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + 1, gameObject.transform.position.z);
+            gameObject.transform.position += Vector3.left * Time.deltaTime * movSpeed;
         }
-
-        if (Input.GetKey(KeyCode.DownArrow))
+        else if (Input.GetKey(KeyCode.W))
         {
-            gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - 1, gameObject.transform.position.z);
+            gameObject.transform.position += Vector3.forward * Time.deltaTime * movSpeed;
         }
-
-        if (Input.GetKey(KeyCode.RightArrow))
+        else if (Input.GetKey(KeyCode.S))
         {
-            gameObject.transform.position = new Vector3(gameObject.transform.position.x + 1, gameObject.transform.position.y, gameObject.transform.position.z);
+            gameObject.transform.position += Vector3.back * Time.deltaTime * movSpeed;
         }
-
-        if (Input.GetKey(KeyCode.LeftArrow))
+        else if (Input.GetKey(KeyCode.D))
         {
-            gameObject.transform.position = new Vector3(gameObject.transform.position.x - 1, gameObject.transform.position.y, gameObject.transform.position.z);
+            gameObject.transform.position += Vector3.right * Time.deltaTime * movSpeed;
+        }
+    }
+
+    private void jump()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && canJump)
+        {
+            rb.AddForce(Vector3.up * fuerzaSalto, ForceMode.Impulse);
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("ground")) {
+            canJump = false;
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("ground"))
+        {
+            canJump = true;
         }
     }
 }
